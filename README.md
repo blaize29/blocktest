@@ -1,2 +1,2 @@
 # blocktest
-testing the connection of my project 
+testing the connection of my project amongst other things
