@@ -30,3 +30,54 @@ class Block{
 };
 
 //Method to calculate the block's hash based on current properties
+calculateHash() {
+    const input = `${this.timestamp}${this.lastHash}${JSON.stringify(this.data)}${this.nonce}${this.difficulty}`;
+
+    switch (this.hashAlgo) {
+        case 'SHA256':
+            return crypto.createHash('sha256').update(input).digest('hex');
+
+        case 'SHA3-256':
+            return crypto.createHash('sha3-256').update(input).digest('hex');  
+        
+        case 'BLAKE2b':
+            return crypto.createHash('blake2b512').update(input).digest('hex');
+
+        case 'BLAKE3':
+            return blake3Hash(Buffer.from(input)).toString('hex');
+
+        default:
+            throw new Error(`Unsupported hashing algorithm: ${this.hashAlgo}`);
+    }
+}
+
+//Static method to create the Genesis block
+static genesis(hashAlgo = DEFAULT_ALGORITHM) {
+    return new this({
+        timestamp: 'Genesis time',
+        lastHash: '----',
+        data: [],
+        nonce: 0, 
+        difficulty: 1,
+        hashAlgo
+    });
+}
+
+//Static method to mine a new block
+static mineBlock({ lastBlock, data, hashAlgo = DEFAULT_ALGORITHM }) {
+    let timestamp, nonce = 0; 
+    const lastHash = lastBlock.Hash;
+    let difficulty = lastBlock.difficulty; //Optional: Difficulty could be adjusted dynamically
+
+    let hash; 
+
+    do {
+        timestamp = Date.now();
+        nonce++; 
+        hash = newBlock({ timestamp, lastHash, data, nonce, difficulty, hashAlgo }).calculateHash(); 
+    } while (hash.substring(0, difficulty) !== '0'.repeat(difficulty)); //Basic Proof of Work
+
+    return new this({ timestamp, lastHash, data, nonce, difficulty, hash, hashAlgo });
+}
+
+module.exports = Block; 
