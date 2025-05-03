@@ -18,7 +18,7 @@ const DEFAULT_ALGORITHM = 'SHA256';
 
 
 class Block{
-    constructor({timestamp, lastHash, data, nonce = 0, difficulty = 1, hashAlgo = DEFAULT_ALGORITHM})   {
+    constructor({timestamp, lastHash, data, nonce = 0, difficulty = 1, hashAlgo = DEFAULT_ALGORITHM}) {
         this.timestamp = timestamp;         //Time when block was created
         this.lastHash = lastHash;           //Hash of previous block
         this.data = data;                   //Transaction data
@@ -27,10 +27,9 @@ class Block{
         this.hashAlgo = hashAlgo;           //Hashing algorithm used
         this.hash = this.calculateHash()    //Block's own hash
     }
-};
 
-//Method to calculate the block's hash based on current properties
-calculateHash() {
+    //Method to calculate the block's hash based on current properties
+    calculateHash() {
     const input = `${this.timestamp}${this.lastHash}${JSON.stringify(this.data)}${this.nonce}${this.difficulty}`;
 
     switch (this.hashAlgo) {
@@ -49,10 +48,10 @@ calculateHash() {
         default:
             throw new Error(`Unsupported hashing algorithm: ${this.hashAlgo}`);
     }
-}
+ }
 
-//Static method to create the Genesis block
-static genesis(hashAlgo = DEFAULT_ALGORITHM) {
+    //Static method to create the Genesis block
+    static genesis(hashAlgo = DEFAULT_ALGORITHM) {
     return new this({
         timestamp: 'Genesis time',
         lastHash: '----',
@@ -61,10 +60,10 @@ static genesis(hashAlgo = DEFAULT_ALGORITHM) {
         difficulty: 1,
         hashAlgo
     });
-}
+ }
 
-//Static method to mine a new block
-static mineBlock({ lastBlock, data, hashAlgo = DEFAULT_ALGORITHM }) {
+ //Static method to mine a new block
+ static mineBlock({ lastBlock, data, hashAlgo = DEFAULT_ALGORITHM }) {
     let timestamp, nonce = 0; 
     const lastHash = lastBlock.Hash;
     let difficulty = lastBlock.difficulty; //Optional: Difficulty could be adjusted dynamically
@@ -78,6 +77,7 @@ static mineBlock({ lastBlock, data, hashAlgo = DEFAULT_ALGORITHM }) {
     } while (hash.substring(0, difficulty) !== '0'.repeat(difficulty)); //Basic Proof of Work
 
     return new this({ timestamp, lastHash, data, nonce, difficulty, hash, hashAlgo });
-}
+  }
+ }
 
 module.exports = Block; 
